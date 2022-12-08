@@ -25,7 +25,12 @@ fn build_messages(chat_id: i64) -> Vec<SendMessageParams> {
     // check if last pow "gorou"
     if rng.gen_bool(0.3) {
         last_pow_text = "...".to_string();
-    } else {
+    }
+    // check if last pow "bota o fuzil pra cantar"
+    else if rng.gen_bool(0.3) {
+        last_pow_text = "BOTA O FUZIL PRA CANTAR PA PUM!!!".to_string();
+    }
+    else {
         last_pow_text = "POOOOWWWW!!!".to_string();
     }
     messages.push(
