@@ -41,6 +41,10 @@ fn main() {
                 command: "sticker".to_string(),
                 description: "sticker aleatorio".to_string(),
             },
+            BotCommand {
+                command: "game".to_string(),
+                description: "desafia alguem para o jogo da velha".to_string(),
+            },
         ])
         .build();
 
