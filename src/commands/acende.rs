@@ -2,6 +2,7 @@ use frankenstein::{Api, SendMessageParams, TelegramApi};
 use rand::Rng;
 
 use super::PipocoCommand;
+use anyhow::Result;
 
 pub struct AcendeCommand {
     messages: Vec<SendMessageParams>,
@@ -14,7 +15,7 @@ impl AcendeCommand {
 }
 
 impl PipocoCommand for AcendeCommand {
-    fn build(&mut self, chat_id: i64) -> &Self {
+    fn build(&mut self, chat_id: i64) -> Result<&Self> {
         let mut rng = rand::thread_rng();
         let rows = rng.gen_range(1..5);
         let mut messages: Vec<SendMessageParams> = vec![];
@@ -48,7 +49,7 @@ impl PipocoCommand for AcendeCommand {
         );
         self.messages = messages;
 
-        self
+        Ok(self)
     }
 
     fn send(&self, api: &Api) {

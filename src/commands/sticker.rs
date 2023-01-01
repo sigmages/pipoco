@@ -2,6 +2,7 @@ use std::fs;
 
 use frankenstein::{Api, SendStickerParams, TelegramApi};
 use rand::Rng;
+use anyhow::Result;
 
 use super::PipocoCommand;
 
@@ -16,7 +17,7 @@ impl StickerCommand {
 }
 
 impl PipocoCommand for StickerCommand {
-    fn build(&mut self, chat_id: i64) -> &Self {
+    fn build(&mut self, chat_id: i64) -> Result<&Self> {
         let base_path = "./bichostrostes/png";
         let dir = fs::read_dir(&base_path).unwrap();
         let size = dir.count();
@@ -37,7 +38,7 @@ impl PipocoCommand for StickerCommand {
             .build();
         self.messages = vec![message];
 
-        self
+        Ok(self)
     }
 
     fn send(&self, api: &Api) {

@@ -8,4 +8,6 @@ edition = "2021"
 [dependencies]
 frankenstein = "0.21"
 rand = "0.8.5"
+thiserror = "1.0.38"
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+anyhow = "1.0.68"

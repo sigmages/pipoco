@@ -3,9 +3,10 @@ use frankenstein::Api;
 pub mod sticker;
 pub mod acende;
 pub mod game;
+use anyhow::Result;
 
 pub trait PipocoCommand {
-    fn build(&mut self, chat_id: i64) -> &Self;
+    fn build(&mut self, chat_id: i64) -> Result<&Self>;
     fn send(&self, api: &Api);
 }
 
@@ -22,9 +23,9 @@ impl From<String> for CommandType {
         let cmd: Vec<&str> = value.split(" ").collect();
         let cmd = cmd.into_iter().nth(0).unwrap_or_default();
         match cmd {
-            "/acende" => Self::Acende,
-            "/sticker" => Self::Sticker,
-            "/game" => Self::Game,
+            "/acende" | "/acende@rojaum_bot" => Self::Acende,
+            "/sticker" | "/sticker@rojaum_bot" => Self::Sticker,
+            "/game" | "/game@rojaum_bot" => Self::Game,
             _ => Self::Unknown,
         }
     }
