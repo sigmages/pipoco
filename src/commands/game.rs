@@ -86,8 +86,8 @@ impl GameCommand {
 
     fn wellcome_text(&self) -> String {
         format!(
-            "O {} desafiou {} para o Jogo da Velha\n {} = X, {} = O",
-            self.owner, self.adversary, self.owner, self.adversary
+            "O {} desafiou {} para o Jogo da Velha\n {} = X, {} = O\n O turno de {}",
+            self.owner, self.adversary, self.owner, self.adversary, self.owner
         )
     }
     fn alternate_turn_text(&self, session: &GameSession) -> String {
