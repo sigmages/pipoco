@@ -98,6 +98,10 @@ fn main() {
                         let username = message.from.username.unwrap_or_default();
                         if !game_session.players.contains_key(&username) {
                             // prevent non users doing plays, just ignore
+                            update_params = update_params_builder
+                                .clone()
+                                .offset(update.update_id + 1)
+                                .build();
                             continue;
                         }
                         let mut game_command =
