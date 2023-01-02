@@ -26,6 +26,7 @@ impl GameSession {
     }
 }
 
+#[derive(Debug)]
 pub struct GameCommand {
     message: Option<SendMessageParams>,
     text: String,

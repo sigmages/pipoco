@@ -81,7 +81,7 @@ fn main() {
                                         .unwrap()
                                         .send(&api)
                                 } else {
-                                    let text = game_command.err().unwrap().to_string();
+                                    let text = game_command.unwrap_err().to_string();
                                     let _ = api.send_message(
                                         &SendMessageParams::builder()
                                             .chat_id(message.chat.id)
