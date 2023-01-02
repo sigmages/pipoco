@@ -53,9 +53,9 @@ impl GameCommand {
             chordinates[1].parse::<usize>().unwrap(),
         );
 
-        // if username != session.current_player {
-        //     bail!("Jogador não pode fazer duas jogadas no mesmo turno");
-        // }
+        if username != session.current_player {
+            bail!("Jogador não pode fazer duas jogadas no mesmo turno");
+        }
         let player = session.players.get(&username).unwrap().clone();
         session.board.insert(x, y, &player);
 

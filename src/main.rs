@@ -73,7 +73,7 @@ fn main() {
                                 game_session = GameSession::new();
                                 let game_command = GameCommand::new(
                                     message.text.unwrap_or_default(),
-                                    message.chat.username.unwrap_or_default(),
+                                    message.from.unwrap().username.unwrap_or_default(),
                                 );
                                 if let Ok(mut command) = game_command {
                                     command
@@ -100,7 +100,7 @@ fn main() {
                         let result = game_command.reply_player_movement(
                             message.message.clone().unwrap().chat.id,
                             message.data.unwrap(),
-                            message.message.clone().unwrap().chat.username.unwrap(),
+                            message.from.username.clone().unwrap_or_default(),
                             &mut game_session,
                         );
                         if let Ok(x) = result {
@@ -118,7 +118,7 @@ fn main() {
                             let _ = api.send_message(
                                 &SendMessageParams::builder()
                                     .chat_id(message.message.clone().unwrap().chat.id)
-                                    .text(format!("{} foi o vencedor!", message.message.clone().unwrap().chat.username.unwrap()))
+                                    .text(format!("{} foi o vencedor!", message.from.username.unwrap_or_default()))
                                     .build(),
                             );
                             // clear game session
