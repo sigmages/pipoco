@@ -95,12 +95,17 @@ fn main() {
                         }
                     }
                     if let UpdateContent::CallbackQuery(message) = update.content.clone() {
+                        let username = message.from.username.unwrap_or_default();
+                        if !game_session.players.contains_key(&username) {
+                            // prevent non users doing plays, just ignore
+                            continue;
+                        }
                         let mut game_command =
                             GameCommand::new("".to_string(), "".to_string()).unwrap();
                         let result = game_command.reply_player_movement(
                             message.message.clone().unwrap().chat.id,
                             message.data.unwrap(),
-                            message.from.username.clone().unwrap_or_default(),
+                            username.clone(),
                             &mut game_session,
                         );
                         if let Ok(x) = result {
@@ -118,7 +123,7 @@ fn main() {
                             let _ = api.send_message(
                                 &SendMessageParams::builder()
                                     .chat_id(message.message.clone().unwrap().chat.id)
-                                    .text(format!("{} foi o vencedor!", message.from.username.unwrap_or_default()))
+                                    .text(format!("{} foi o vencedor!", username.clone()))
                                     .build(),
                             );
                             // clear game session
