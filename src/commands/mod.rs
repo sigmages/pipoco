@@ -3,6 +3,10 @@ use frankenstein::Api;
 pub mod sticker;
 pub mod acende;
 pub mod game;
+pub mod xcomment;
+pub mod dollar;
+pub mod wiki;
+
 use anyhow::Result;
 
 pub trait PipocoCommand {
@@ -15,6 +19,9 @@ pub enum CommandType {
     Acende,
     Sticker,
     Game,
+    XComment,
+    Dollar,
+    Wiki,
     Unknown
 }
 
@@ -26,6 +33,9 @@ impl From<String> for CommandType {
             "/acende" | "/acende@rojaum_bot" => Self::Acende,
             "/sticker" | "/sticker@rojaum_bot" => Self::Sticker,
             "/game" | "/game@rojaum_bot" => Self::Game,
+            "/xcomment" | "/xcomment@rojaum_bot" => Self::XComment,
+            "/dollar" | "/dollar@rojaum_bot" => Self::Dollar,
+            "/wiki" | "/wiki@rojaum_bot" => Self::Wiki,
             _ => Self::Unknown,
         }
     }

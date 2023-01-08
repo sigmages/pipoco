@@ -2,6 +2,7 @@ pub mod algorithm;
 mod commands;
 
 use commands::game::GameSession;
+use commands::wiki::WikiCommand;
 use frankenstein::AllowedUpdate;
 use frankenstein::BotCommand;
 use frankenstein::GetUpdatesParams;
@@ -11,15 +12,18 @@ use frankenstein::TelegramApi;
 use frankenstein::{Api, UpdateContent};
 
 use crate::commands::acende::AcendeCommand;
+use crate::commands::dollar::DollarToBRLCommand;
 use crate::commands::game::GameCommand;
 use crate::commands::sticker::StickerCommand;
+use crate::commands::xcomment::XComment;
 use crate::commands::CommandType;
 use crate::commands::PipocoCommand;
+use anyhow::Result;
 
 static TOKEN: &str = "5922619577:AAHGRGbHTcYonxmQEQbR7MMeEVZa57p_0rY";
 
-
-fn main() {
+#[tokio::main]
+async fn main() -> Result<()> {
     let api = Api::new(TOKEN);
 
     let update_params_builder = GetUpdatesParams::builder().allowed_updates(vec![
@@ -45,6 +49,18 @@ fn main() {
                 command: "game".to_string(),
                 description: "desafia alguem para o jogo da velha".to_string(),
             },
+            BotCommand {
+                command: "xcomment".to_string(),
+                description: "comentario aleatorio do xvideos, aceita sugestões".to_string(),
+            },
+            BotCommand {
+                command: "dollar".to_string(),
+                description: "mostra acotação do dólar hoje".to_string(),
+            },
+            BotCommand {
+                command: "wiki".to_string(),
+                description: "pesquisa na wikipédia e retorna a introdução".to_string(),
+            },
         ])
         .build();
 
@@ -69,17 +85,16 @@ fn main() {
                                 .unwrap()
                                 .send(&api),
                             CommandType::Game => {
-                                // always clear the session when a new game are created
+                                // always clear the session when a new game is created
                                 game_session = GameSession::new();
-                                let game_command = GameCommand::new(
+                                let mut game_command = GameCommand::new(
                                     message.text.unwrap_or_default(),
                                     message.from.unwrap().username.unwrap_or_default(),
-                                );
-                                if let Ok(mut command) = game_command {
-                                    command
-                                        .build(message.chat.id, &mut game_session)
-                                        .unwrap()
-                                        .send(&api)
+                                )?;
+                                let game_command =
+                                    game_command.build(message.chat.id, &mut game_session);
+                                if let Ok(command) = game_command {
+                                    command.send(&api)
                                 } else {
                                     let text = game_command.unwrap_err().to_string();
                                     let _ = api.send_message(
@@ -90,6 +105,30 @@ fn main() {
                                     );
                                 }
                             }
+                            CommandType::XComment => {
+                                let mut xcomment_builder =
+                                    XComment::new(message.text.unwrap_or_default());
+                                let message = xcomment_builder
+                                    .build(message.chat.id, message.message_id)
+                                    .await;
+                                if message.is_ok() {
+                                    message?.send(&api).await;
+                                }
+                                ()
+                            }
+                            CommandType::Dollar => {
+                                DollarToBRLCommand::new()
+                                    .build(message.chat.id, message.message_id)
+                                    .await?
+                                    .send(&api);
+                            }
+                            CommandType::Wiki => {
+                                WikiCommand::new(message.text.unwrap_or_default())
+                                    .build(message.chat.id, message.message_id)
+                                    .await?
+                                    .send(&api);
+                            }
+
                             // nothing to do...
                             CommandType::Unknown => (),
                         }
