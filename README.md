@@ -17,3 +17,8 @@
 
 * /dollar
     Exibe a cotação em reais do dólar hoje
+
+
+## Executando
+
+Instale as dependências python com `pip install -r requirements.txt`, em seguida suba o bot com o comando: `cargo run`
