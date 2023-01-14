@@ -1,5 +1,6 @@
 pub mod algorithm;
 mod commands;
+mod constants;
 
 use commands::game::GameSession;
 use commands::wiki::WikiCommand;
@@ -16,11 +17,12 @@ use crate::commands::dollar::DollarToBRLCommand;
 use crate::commands::game::GameCommand;
 use crate::commands::sticker::StickerCommand;
 use crate::commands::xcomment::XComment;
+use crate::commands::ai::AiCommand;
 use crate::commands::CommandType;
 use crate::commands::PipocoCommand;
 use anyhow::Result;
 
-static TOKEN: &str = "5922619577:AAHGRGbHTcYonxmQEQbR7MMeEVZa57p_0rY";
+static TOKEN: &str = "";
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -60,6 +62,10 @@ async fn main() -> Result<()> {
             BotCommand {
                 command: "wiki".to_string(),
                 description: "pesquisa na wikipédia e retorna a introdução".to_string(),
+            },
+            BotCommand {
+                command: "ai".to_string(),
+                description: "gera imagem usando stable diffusion".to_string(),
             },
         ])
         .build();
@@ -127,6 +133,14 @@ async fn main() -> Result<()> {
                                     .build(message.chat.id, message.message_id)
                                     .await?
                                     .send(&api);
+                            }
+                            CommandType::Ai => {
+                                let _ = tokio::spawn(async move {
+                                    AiCommand::new(message.text.unwrap_or_default())
+                                    .build(message.chat.id, message.message_id)
+                                    .await.unwrap()
+                                    .send(Api::new(TOKEN));
+                                });
                             }
 
                             // nothing to do...

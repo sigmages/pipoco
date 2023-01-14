@@ -1,1 +1,3 @@
 /target
+/outputs/*.jpeg
+/outputs/*.png

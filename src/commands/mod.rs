@@ -6,6 +6,7 @@ pub mod game;
 pub mod xcomment;
 pub mod dollar;
 pub mod wiki;
+pub mod ai;
 
 use anyhow::Result;
 
@@ -22,6 +23,7 @@ pub enum CommandType {
     XComment,
     Dollar,
     Wiki,
+    Ai,
     Unknown
 }
 
@@ -36,6 +38,7 @@ impl From<String> for CommandType {
             "/xcomment" | "/xcomment@rojaum_bot" => Self::XComment,
             "/dollar" | "/dollar@rojaum_bot" => Self::Dollar,
             "/wiki" | "/wiki@rojaum_bot" => Self::Wiki,
+            "/ai" | "/ai@rojaum_bot" => Self::Ai,
             _ => Self::Unknown,
         }
     }
