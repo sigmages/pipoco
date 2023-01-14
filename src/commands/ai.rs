@@ -36,7 +36,8 @@ impl AiCommand {
 
 fn save_img_from_response(search_term: String, value: Value) -> PathBuf {
     // saving file
-    let search_term = search_term.to_case(Case::Snake)[..10].to_string();
+    let search_term = search_term.to_case(Case::Snake);
+    let search_term = search_term.get(..10).unwrap_or(&search_term).to_string();
     let filepath = format!("./outputs/{search_term}.png");
     let input = value["images"][0].as_str().unwrap();
     let decode = general_purpose::STANDARD.decode(input).unwrap();
