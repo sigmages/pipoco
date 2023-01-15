@@ -2,6 +2,8 @@ pub mod algorithm;
 mod commands;
 mod constants;
 
+use std::os;
+
 use commands::game::GameSession;
 use commands::wiki::WikiCommand;
 use frankenstein::AllowedUpdate;
@@ -11,21 +13,29 @@ use frankenstein::SendMessageParams;
 use frankenstein::SetMyCommandsParams;
 use frankenstein::TelegramApi;
 use frankenstein::{Api, UpdateContent};
+use tokio::signal;
 
 use crate::commands::acende::AcendeCommand;
+use crate::commands::ai::AiCommand;
 use crate::commands::dollar::DollarToBRLCommand;
 use crate::commands::game::GameCommand;
+use crate::commands::gpt::GptCommand;
 use crate::commands::sticker::StickerCommand;
 use crate::commands::xcomment::XComment;
-use crate::commands::ai::AiCommand;
 use crate::commands::CommandType;
 use crate::commands::PipocoCommand;
 use anyhow::Result;
+use tokio::signal::unix::{Signal, SignalKind};
 
-static TOKEN: &str = "";
+static TOKEN: &str = "5922619577:AAGCq7jTiXQx9_qSlSC2F9gZCoyP24UBS-s";
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    tokio::spawn(async move {
+        signal::ctrl_c().await.expect("should stop application");
+        std::process::exit(1);
+    });
+
     let api = Api::new(TOKEN);
 
     let update_params_builder = GetUpdatesParams::builder().allowed_updates(vec![
@@ -137,12 +147,21 @@ async fn main() -> Result<()> {
                             CommandType::Ai => {
                                 let _ = tokio::spawn(async move {
                                     AiCommand::new(message.text.unwrap_or_default())
-                                    .build(message.chat.id, message.message_id)
-                                    .await.unwrap()
-                                    .send(Api::new(TOKEN));
+                                        .build(message.chat.id, message.message_id)
+                                        .await
+                                        .unwrap()
+                                        .send(Api::new(TOKEN));
                                 });
                             }
-
+                            CommandType::Gpt => {
+                                let _ = tokio::spawn(async move {
+                                    GptCommand::new(message.text.unwrap_or_default())
+                                        .build(message.chat.id, message.message_id)
+                                        .await
+                                        .unwrap()
+                                        .send(Api::new(TOKEN));
+                                });
+                            }
                             // nothing to do...
                             CommandType::Unknown => (),
                         }
