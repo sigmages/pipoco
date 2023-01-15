@@ -27,7 +27,7 @@ use crate::commands::PipocoCommand;
 use anyhow::Result;
 use tokio::signal::unix::{Signal, SignalKind};
 
-static TOKEN: &str = "5922619577:AAGCq7jTiXQx9_qSlSC2F9gZCoyP24UBS-s";
+static TOKEN: &str = "";
 
 #[tokio::main]
 async fn main() -> Result<()> {
