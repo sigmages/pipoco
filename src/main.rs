@@ -134,7 +134,7 @@ async fn main() -> Result<()> {
                             }
                             CommandType::Dollar => {
                                 DollarToBRLCommand::new()
-                                    .build(message.chat.id, message.message_id)
+                                    .build(message.chat.id, message.message_id, message.text)
                                     .await?
                                     .send(&api);
                             }
