@@ -1,11 +1,11 @@
-use std::{path::PathBuf, fs, sync::Arc};
+use std::{fs, path::PathBuf, sync::Arc};
 
 use anyhow::Result;
-use frankenstein::{Api, SendPhotoParams, TelegramApi};
+use base64::{engine::general_purpose, Engine as _};
 use convert_case::{Case, Casing};
+use frankenstein::{Api, SendMessageParams, SendPhotoParams, TelegramApi};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use base64::{Engine as _, engine::general_purpose};
 
 use crate::constants::DEFAULT_NEGATIVE_PROMPT;
 
@@ -15,13 +15,16 @@ struct Payload {
     steps: i32,
     width: i32,
     height: i32,
+    cfg_scale: i32,
     negative_prompt: String,
+    // sampler_index: String,
 }
 
 pub struct AiCommand {
     messages: Vec<SendPhotoParams>,
     text: String,
     search_term: String,
+    error_messages: Vec<SendMessageParams>,
 }
 
 impl AiCommand {
@@ -30,6 +33,7 @@ impl AiCommand {
             messages: vec![],
             text,
             search_term: "".to_string(),
+            error_messages: vec![],
         }
     }
 }
@@ -42,11 +46,18 @@ fn save_img_from_response(search_term: String, value: Value) -> PathBuf {
     let input = value["images"][0].as_str().unwrap();
     let decode = general_purpose::STANDARD.decode(input).unwrap();
     fs::write(&filepath, decode).unwrap();
-    
+
     // return the file
     let file = std::path::PathBuf::from(filepath);
 
     file
+}
+
+fn split_prompts(text: &str) -> (String, String) {
+    let positive: String = text.split("positive:").collect();
+    let negative: String = text.split("negative:").collect();
+
+    (positive.trim().to_owned(), negative.trim().to_owned())
 }
 
 impl AiCommand {
@@ -54,13 +65,27 @@ impl AiCommand {
         let args: Vec<&str> = self.text.split(" ").collect();
         let search_term = args[1..].join(" ");
         self.search_term = search_term.trim().to_owned();
+        // let (positive, negative) = split_prompts(&self.search_term);
 
+        // if positive.is_empty() || negative.is_empty() {
+        //     self.error_messages.push(
+        //         SendMessageParams::builder()
+        //             .chat_id(chat_id)
+        //             .text("prompt inválido, deve ser positive: <text> negative: <text>".to_string())
+        //             .reply_to_message_id(message_id)
+        //             .build(),
+        //     );
+        //     return Ok(self);
+        // }
         let payload = Payload {
             prompt: self.search_term.clone(),
             steps: 20,
             width: 512,
-            height: 720,
+            height: 768,
+            cfg_scale: 7,
             negative_prompt: DEFAULT_NEGATIVE_PROMPT.to_string(),
+            // sampler_index: "DPM++ 2M Karras".to_string(),
+            // sampler_index: "euler a".to_string(),
         };
         let client = reqwest::Client::new();
         let response = client
@@ -92,11 +117,13 @@ impl AiCommand {
     }
 }
 
-
 #[cfg(test)]
 pub mod test {
-    use std::{fs::{File, self}, io::BufReader};
-    use base64::{Engine as _, engine::general_purpose};
+    use base64::{engine::general_purpose, Engine as _};
+    use std::{
+        fs::{self, File},
+        io::BufReader,
+    };
 
     use serde_json::Value;
 
@@ -106,11 +133,10 @@ pub mod test {
         let filepath = "./outputs/testfile.jpeg";
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
-        
+
         let value: Value = serde_json::from_reader(reader).unwrap();
         let input = value["images"][0].as_str().unwrap();
         let decode = general_purpose::STANDARD.decode(input).unwrap();
         fs::write(filepath, decode).unwrap();
     }
 }
-

@@ -8,6 +8,7 @@ pub mod dollar;
 pub mod wiki;
 pub mod ai;
 pub mod gpt;
+pub mod dalle;
 
 use anyhow::Result;
 
@@ -25,6 +26,7 @@ pub enum CommandType {
     Dollar,
     Wiki,
     Ai,
+    Anime,
     Gpt,
     Unknown
 }
@@ -41,6 +43,7 @@ impl From<String> for CommandType {
             "/dollar" | "/dollar@rojaum_bot" => Self::Dollar,
             "/wiki" | "/wiki@rojaum_bot" => Self::Wiki,
             "/ai" | "/ai@rojaum_bot" => Self::Ai,
+            "/anime" | "/anime@rojaum_bot" => Self::Anime,
             "/gpt" | "/gpt@rojaum_bot" => Self::Gpt,
             _ => Self::Unknown,
         }

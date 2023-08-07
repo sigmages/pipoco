@@ -6,7 +6,8 @@ api_key = os.environ.get('OPENAI_API_KEY')
 # Set the API key
 openai.api_key = api_key
 def get_image_link(prompt: str) -> str:
-    openai.Image.create(prompt=prompt)['data'][0]['url']
+    response = openai.Image.create(prompt=prompt)['data'][0]['url']
+    return response
 
 
 def get_text_suggestion(prompt: str) -> str:
@@ -21,4 +22,6 @@ def get_text_suggestion(prompt: str) -> str:
     )['choices'][0]['text']
     return response
 
-get_text_suggestion('write in python, a code that print hello word in japanese')
+# response = get_image_link("squirrel")
+# print(response)
+# breakpoint()

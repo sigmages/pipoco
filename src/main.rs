@@ -17,6 +17,7 @@ use tokio::signal;
 
 use crate::commands::acende::AcendeCommand;
 use crate::commands::ai::AiCommand;
+use crate::commands::dalle::DalleCommand;
 use crate::commands::dollar::DollarToBRLCommand;
 use crate::commands::game::GameCommand;
 use crate::commands::gpt::GptCommand;
@@ -144,9 +145,18 @@ async fn main() -> Result<()> {
                                     .await?
                                     .send(&api);
                             }
-                            CommandType::Ai => {
+                            CommandType::Anime => {
                                 let _ = tokio::spawn(async move {
                                     AiCommand::new(message.text.unwrap_or_default())
+                                        .build(message.chat.id, message.message_id)
+                                        .await
+                                        .unwrap()
+                                        .send(Api::new(TOKEN));
+                                });
+                            }
+                            CommandType::Ai => {
+                                let _ = tokio::spawn(async move {
+                                    DalleCommand::new(message.text.unwrap_or_default())
                                         .build(message.chat.id, message.message_id)
                                         .await
                                         .unwrap()
